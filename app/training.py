@@ -146,17 +146,22 @@ def save_model(pipeline: Pipeline, path, threshold: float, metadata: dict | None
         },
     }
     joblib.dump(bundle, path)
-    path.with_suffix(".json").write_text(
-        json.dumps(bundle["metadata"] | {"threshold": threshold}, indent=2, default=str)
-    )
+    sidecar = bundle["metadata"] | {"threshold": threshold, "sha256": file_sha256(path)}
+    path.with_suffix(".json").write_text(json.dumps(sidecar, indent=2, default=str))
     return path
 
 
-def load_model(path) -> dict:
-    """Charge un modèle sauvegardé et vérifie sa structure."""
+def load_model(path, expected_sha256: str | None = None) -> dict:
+    """Charge un modèle sauvegardé et vérifie sa structure.
+
+    joblib/pickle peut exécuter du code à la lecture : on ne charge que des fichiers de confiance,
+    et l'empreinte SHA-256 enregistrée à la sauvegarde permet de détecter un fichier modifié.
+    """
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(f"Modèle introuvable : {path}")
+    if expected_sha256 is not None and file_sha256(path) != expected_sha256:
+        raise ValueError(f"Intégrité du modèle non vérifiée (empreinte SHA-256 différente) : {path}")
     try:
         bundle = joblib.load(path)
     except Exception as exc:  # fichier corrompu ou d'un autre format

@@ -4,6 +4,9 @@ Les journaux ne contiennent jamais de valeurs de transaction : seulement des com
 """
 
 import logging
+import os
+import platform
+import time
 
 import numpy as np
 import pandas as pd
@@ -65,3 +68,96 @@ def check_alerts(X: pd.DataFrame, reference: dict) -> list[str]:
         alerts.append(f"derive:{','.join(drifted)}")
         logger.warning("Alerte de dérive : %d variable(s) hors plage d'entraînement", len(drifted))
     return alerts
+
+
+def environment_profile() -> dict:
+    """Description du matériel pour le protocole de mesure."""
+    import psutil
+
+    return {
+        "processeur": platform.processor() or platform.machine(),
+        "coeurs_logiques": os.cpu_count(),
+        "memoire_totale_go": round(psutil.virtual_memory().total / 1e9, 1),
+        "systeme": platform.platform(),
+        "python": platform.python_version(),
+    }
+
+
+def _percentiles(values_ms) -> dict:
+    v = np.asarray(values_ms)
+    return {
+        "moyenne_ms": float(v.mean()),
+        "p50_ms": float(np.percentile(v, 50)),
+        "p95_ms": float(np.percentile(v, 95)),
+        "p99_ms": float(np.percentile(v, 99)),
+        "max_ms": float(v.max()),
+    }
+
+
+def measure_performance(
+    model,
+    X: pd.DataFrame,
+    threshold: float,
+    n_single: int = 1000,
+    warmup: int = 50,
+    batch_sizes=(100, 1000, 10000),
+    n_batch_repeats: int = 5,
+    seed: int = 42,
+) -> dict:
+    """Latence d'une prédiction isolée (modèle seul / avec contrôle des entrées), débit par lot, mémoire.
+
+    Protocole : perf_counter, `warmup` appels ignorés, `n_single` prédictions isolées tirées au hasard,
+    `n_batch_repeats` répétitions par taille de lot. Une requête API ajouterait le traitement HTTP
+    et la (dé)sérialisation JSON, non mesurés ici.
+    """
+    import psutil
+
+    rng = np.random.default_rng(seed)
+    rows = rng.integers(0, len(X), n_single + warmup)
+    model_only, with_contract = [], []
+    for i, r in enumerate(rows):
+        x = X.iloc[[r]]
+        t0 = time.perf_counter()
+        model.predict_proba(x[FEATURES])
+        t1 = time.perf_counter()
+        predict_fraud(model, x, threshold=threshold)
+        t2 = time.perf_counter()
+        if i >= warmup:
+            model_only.append((t1 - t0) * 1000)
+            with_contract.append((t2 - t1) * 1000)
+
+    throughput = {}
+    for size in batch_sizes:
+        batch = X.iloc[rng.integers(0, len(X), size)]
+        durations = []
+        for _ in range(n_batch_repeats):
+            t0 = time.perf_counter()
+            predict_fraud(model, batch, threshold=threshold)
+            durations.append(time.perf_counter() - t0)
+        throughput[str(size)] = {
+            "duree_mediane_s": float(np.median(durations)),
+            "predictions_par_s": float(size / np.median(durations)),
+        }
+
+    import tracemalloc
+
+    big = X.iloc[rng.integers(0, len(X), max(batch_sizes))]
+    tracemalloc.start()
+    predict_fraud(model, big, threshold=threshold)
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return {
+        "latence_prediction_isolee_modele_seul": _percentiles(model_only),
+        "latence_prediction_isolee_avec_controle_entrees": _percentiles(with_contract),
+        "debit_par_lot": throughput,
+        "memoire_processus_mo": round(psutil.Process().memory_info().rss / 1e6, 1),
+        "memoire_pic_inference_lot_mo": round(peak / 1e6, 1),
+        "protocole": {
+            "repetitions_isolees": n_single,
+            "echauffement": warmup,
+            "tailles_de_lot": list(batch_sizes),
+            "repetitions_par_lot": n_batch_repeats,
+            "horloge": "time.perf_counter",
+            "materiel": environment_profile(),
+        },
+    }

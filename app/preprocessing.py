@@ -62,11 +62,19 @@ def validate_data(df: pd.DataFrame, require_target: bool = True) -> pd.DataFrame
     return df.copy()
 
 
-def load_data(path) -> pd.DataFrame:
-    """Charge un fichier CSV et valide son contenu."""
+MAX_FILE_SIZE_MB = 500  # le jeu complet pèse environ 150 Mo
+
+
+def load_data(path, max_size_mb: float = MAX_FILE_SIZE_MB) -> pd.DataFrame:
+    """Charge un fichier CSV et valide son contenu (extension, taille, format, schéma)."""
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(f"Fichier de données introuvable : {path}")
+    if path.suffix.lower() != ".csv":
+        raise ValueError(f"Extension non autorisée : {path.suffix or '(aucune)'} (seul .csv est accepté)")
+    size_mb = path.stat().st_size / 1e6
+    if size_mb > max_size_mb:
+        raise ValueError(f"Fichier trop volumineux : {size_mb:.1f} Mo (maximum {max_size_mb} Mo)")
     try:
         df = pd.read_csv(path)
     except (pd.errors.ParserError, pd.errors.EmptyDataError, UnicodeDecodeError) as exc:
