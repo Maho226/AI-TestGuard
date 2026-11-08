@@ -1,0 +1,61 @@
+{
+  "expected_flag_rate": 0.001674156313331571,
+  "psi_thresholds": {
+    "warning": 0.1,
+    "alert": 0.25
+  },
+  "simulated_alerts": [
+    {
+      "scénario": "Lot normal (validation)",
+      "PSI max": "0.001 (V20)",
+      "taux signalé": "0.1674%",
+      "alertes PSI / taux": "aucune",
+      "alertes de plage (avant)": "aucune"
+    },
+    {
+      "scénario": "V14 + 1 écart-type (A4)",
+      "PSI max": "1.418 (V14)",
+      "taux signalé": "0.1551%",
+      "alertes PSI / taux": "derive_importante:V14",
+      "alertes de plage (avant)": "aucune"
+    },
+    {
+      "scénario": "Amount × 3 (inflation)",
+      "PSI max": "0.417 (Amount)",
+      "taux signalé": "0.1709%",
+      "alertes PSI / taux": "derive_importante:Amount",
+      "alertes de plage (avant)": "montant_eleve:5"
+    },
+    {
+      "scénario": "Panne : tout est signalé",
+      "PSI max": "0.001 (V20)",
+      "taux signalé": "100.0000%",
+      "alertes PSI / taux": "taux_signalement:100.0000% (attendu 0.1674%)",
+      "alertes de plage (avant)": "aucune"
+    }
+  ],
+  "temporal_day1_day2": [
+    {
+      "jeu": "validation",
+      "période": "jour 1",
+      "transactions": 28928,
+      "fraudes": 57,
+      "PSI max (top 3)": "V23 0.001, V13 0.001, V9 0.001",
+      "taux signalé": "0.1763%",
+      "rappel*": 0.789,
+      "précision*": 0.882,
+      "FPR*": "0.0208%"
+    },
+    {
+      "jeu": "validation",
+      "période": "jour 2",
+      "transactions": 27817,
+      "fraudes": 37,
+      "PSI max (top 3)": "V1 1.596, V3 1.439, V28 1.071",
+      "taux signalé": "0.1582%",
+      "rappel*": 0.865,
+      "précision*": 0.727,
+      "FPR*": "0.0432%"
+    }
+  ]
+}
