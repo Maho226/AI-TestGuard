@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+.env
+# Données complètes (Kaggle) : jamais dans le dépôt
+data/*.csv
+# Artefacts générés
+models/
+*.joblib
