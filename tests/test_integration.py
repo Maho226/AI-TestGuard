@@ -50,13 +50,20 @@ def test_dimensions_are_consistent(run):
 
 
 # ---------------------------------------------------------------- T10 fuites de données
+def _into_scaler(pipeline, X):
+    """Données telles qu'elles entrent dans le scaler (après les étapes éventuelles qui le précèdent)."""
+    position = list(pipeline.named_steps).index("scaler")
+    return np.asarray(pipeline[:position].transform(X) if position else X)
+
+
 def test_t10_scaler_fitted_on_training_data_only(run):
-    scaler = run["pipeline"].named_steps["scaler"]
-    X_train = run["splits"]["X_train"]
-    assert scaler.n_samples_seen_ == len(X_train)
-    np.testing.assert_allclose(scaler.mean_, X_train[FEATURES].mean().to_numpy(), rtol=1e-10)
-    all_data = pd.concat([X_train, run["splits"]["X_val"], run["splits"]["X_test"]])
-    assert not np.allclose(scaler.mean_, all_data[FEATURES].mean().to_numpy(), rtol=1e-6)
+    pipeline = run["pipeline"]
+    scaler = pipeline.named_steps["scaler"]
+    seen_train = _into_scaler(pipeline, run["splits"]["X_train"][FEATURES])
+    assert scaler.n_samples_seen_ == len(seen_train)
+    np.testing.assert_allclose(scaler.mean_, seen_train.mean(axis=0), rtol=1e-10)
+    all_data = pd.concat([run["splits"]["X_train"], run["splits"]["X_val"], run["splits"]["X_test"]])
+    assert not np.allclose(scaler.mean_, _into_scaler(pipeline, all_data[FEATURES]).mean(axis=0), rtol=1e-6)
 
 
 def test_t10_no_shared_transactions_between_train_and_test(run):

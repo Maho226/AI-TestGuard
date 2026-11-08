@@ -139,3 +139,36 @@ def sensitivity(model, X, y, threshold: float, X_perturbed, n_invalid: int = 0) 
         "fpr_after": m1["fpr"],
         "n_invalid": n_invalid,
     }
+
+
+# Tolérances de non-régression (plan de test, T16) : dégradation maximale admise par rapport à la référence
+REGRESSION_TOLERANCES = {"pr_auc": 0.02, "recall": 0.03, "precision": 0.05, "fpr": 0.0005}
+HIGHER_IS_BETTER = {"pr_auc": True, "recall": True, "precision": True, "fpr": False}
+
+
+def compare_to_baseline(new: dict, baseline: dict, tolerances: dict = REGRESSION_TOLERANCES) -> dict:
+    """Compare les métriques d'une nouvelle version à la référence figée.
+
+    - aucune dégradation au-delà de la tolérance : « accepter » ;
+    - dégradation au-delà de la tolérance : « investiguer » (le contrôle automatisé échoue) ;
+    - dégradation au-delà du double de la tolérance : « rejeter ».
+    """
+    details, worst = {}, 0.0
+    for metric, tol in tolerances.items():
+        ref, cur = baseline[metric], new[metric]
+        degradation = (ref - cur) if HIGHER_IS_BETTER[metric] else (cur - ref)
+        details[metric] = {
+            "reference": ref,
+            "nouvelle": cur,
+            "ecart": cur - ref,
+            "tolerance": tol,
+            "regression": bool(degradation > tol),
+        }
+        worst = max(worst, degradation / tol)
+    if worst > 2:
+        decision = "rejeter"
+    elif worst > 1:
+        decision = "investiguer"
+    else:
+        decision = "accepter"
+    return {"metrics": details, "decision": decision}
