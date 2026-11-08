@@ -1,0 +1,9 @@
+scénario,attendu,probabilités valides,transactions signalées,alertes,résultat
+Amount = 10 × le maximum d'entraînement (100 transactions),traiter + alerte,True,100.0,montant_eleve:100; derive:Amount,
+Amount = 1000 × le maximum d'entraînement (100 transactions),traiter + alerte,True,100.0,montant_eleve:100; derive:Amount,
+Valeur manquante (V3),rejeter,,,,rejeté : Valeurs manquantes dans : ['V3']
+Valeur infinie (V5),rejeter,,,,rejeté : Valeurs infinies dans : ['V5']
+Valeur non numérique (Amount),rejeter,,,,rejeté : Colonnes non numériques : ['Amount']
+Montant négatif,rejeter,,,,rejeté : Montant (Amount) négatif
+Schéma invalide : V28 absente,rejeter,,,,rejeté : Colonnes manquantes : ['V28']
+Schéma invalide : colonne inconnue,rejeter,,,,rejeté : Colonnes inconnues : ['merchant_id']

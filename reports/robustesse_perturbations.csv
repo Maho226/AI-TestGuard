@@ -1,0 +1,8 @@
+scénario,attendu,mean_abs_proba_change,p99_abs_proba_change,class_changes,class_changes_frauds,recall_before,recall_after,precision_before,precision_after,fpr_before,fpr_after,n_invalid,alertes
+Bruit V1–V28 : 1 % de l'écart-type,traiter,0.001055,0.009272,0,0,0.808511,0.808511,0.883721,0.883721,0.000177,0.000177,0,
+Bruit V1–V28 : 5 % de l'écart-type,traiter,0.005287,0.046437,0,0,0.808511,0.808511,0.883721,0.883721,0.000177,0.000177,0,
+Bruit V1–V28 : 10 % de l'écart-type,traiter,0.010634,0.093232,0,0,0.808511,0.808511,0.883721,0.883721,0.000177,0.000177,0,
+Amount : variation de ± 5 %,traiter,0.000443,0.007836,0,0,0.808511,0.808511,0.883721,0.883721,0.000177,0.000177,0,
+Amount : variation de ± 20 %,traiter,0.001755,0.031293,0,0,0.808511,0.808511,0.883721,0.883721,0.000177,0.000177,0,
+Décalage : Amount × 3 (inflation),traiter + alerte,0.041685,0.779219,104,0,0.808511,0.808511,0.883721,0.4,0.000177,0.002012,0,montant_eleve:5
+Décalage : V14 + 1 écart-type,traiter + alerte,0.040686,0.286559,4,4,0.808511,0.765957,0.883721,0.878049,0.000177,0.000177,0,aucune
