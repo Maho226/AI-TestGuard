@@ -161,3 +161,53 @@ def measure_performance(
             "materiel": environment_profile(),
         },
     }
+
+
+# ---------------------------------------------------------------- surveillance (Partie X)
+PSI_WARNING = 0.10  # dérive modérée : à surveiller
+PSI_ALERT = 0.25  # dérive importante : alerte
+# Time est une position dans la fenêtre de collecte : sa distribution change par construction, il n'est pas suivi
+DRIFT_FEATURES = [c for c in FEATURES if c != "Time"]
+
+
+def drift_reference(X_train: pd.DataFrame, n_bins: int = 10) -> dict:
+    """Bornes de déciles et proportions de référence de chaque variable (données d'entraînement)."""
+    reference = {}
+    for col in DRIFT_FEATURES:
+        edges = np.unique(np.quantile(X_train[col], np.linspace(0, 1, n_bins + 1)))
+        edges[0], edges[-1] = -np.inf, np.inf
+        counts = np.histogram(X_train[col], bins=edges)[0]
+        reference[col] = {"edges": edges.tolist(), "ref": (counts / counts.sum()).tolist()}
+    return reference
+
+
+def population_stability_index(X: pd.DataFrame, reference: dict, eps: float = 1e-4) -> pd.Series:
+    """PSI par variable : somme de (p_obs − p_ref) × ln(p_obs / p_ref) sur les intervalles de référence."""
+    values = {}
+    for col, ref in reference.items():
+        observed = np.histogram(X[col], bins=np.asarray(ref["edges"]))[0] / len(X)
+        p_ref = np.clip(np.asarray(ref["ref"]), eps, None)
+        p_obs = np.clip(observed, eps, None)
+        values[col] = float(np.sum((p_obs - p_ref) * np.log(p_obs / p_ref)))
+    return pd.Series(values).sort_values(ascending=False)
+
+
+def monitoring_report(X: pd.DataFrame, y_pred, reference: dict, expected_flag_rate: float, tolerance: float = 2.0):
+    """Indicateurs disponibles SANS labels : dérive (PSI) et taux de transactions signalées."""
+    psi = population_stability_index(X, reference)
+    flag_rate = float(np.mean(y_pred))
+    ratio = flag_rate / expected_flag_rate if expected_flag_rate > 0 else float("inf")
+    alerts = [f"derive_importante:{c}" for c in psi[psi > PSI_ALERT].index]
+    warnings = [f"derive_moderee:{c}" for c in psi[(psi > PSI_WARNING) & (psi <= PSI_ALERT)].index]
+    if not 1 / tolerance <= ratio <= tolerance:
+        alerts.append(f"taux_signalement:{flag_rate:.4%} (attendu {expected_flag_rate:.4%})")
+    for a in alerts:
+        logger.warning("Alerte de surveillance : %s", a.split(":")[0])
+    return {
+        "psi_max": float(psi.max()),
+        "psi": psi.round(4).to_dict(),
+        "flag_rate": flag_rate,
+        "flag_rate_ratio": ratio,
+        "alerts": alerts,
+        "warnings": warnings,
+    }
