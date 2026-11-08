@@ -92,3 +92,50 @@ def check_acceptance(metrics: dict, criteria: dict = ACCEPTANCE) -> dict:
     else:
         decision = "à investiguer"
     return {"criteria": details, "decision": decision}
+
+
+def perturb(X, columns, kind: str, amplitude: float, scale=None, seed: int = 42):
+    """Renvoie une copie perturbée de X et le nombre de valeurs rendues invalides.
+
+    - kind="gaussian" : bruit N(0, amplitude × écart-type d'entraînement) sur chaque colonne (V1–V28) ;
+    - kind="relative" : variation multiplicative uniforme de ± amplitude (Amount).
+    Les montants rendus négatifs sont comptés comme invalides puis ramenés à 0.
+    """
+    rng = np.random.default_rng(seed)
+    Xp = X.copy()
+    for col in columns:
+        if kind == "gaussian":
+            sigma = amplitude * (scale[col] if scale is not None else X[col].std())
+            Xp[col] = X[col] + rng.normal(0.0, sigma, len(X))
+        elif kind == "relative":
+            Xp[col] = X[col] * (1 + rng.uniform(-amplitude, amplitude, len(X)))
+        else:
+            raise ValueError(f"Perturbation inconnue : {kind}")
+    n_invalid = int((Xp["Amount"] < 0).sum()) if "Amount" in Xp else 0
+    if n_invalid:
+        Xp["Amount"] = Xp["Amount"].clip(lower=0)
+    return Xp, n_invalid
+
+
+def sensitivity(model, X, y, threshold: float, X_perturbed, n_invalid: int = 0) -> dict:
+    """Mesure l'effet d'une perturbation : probabilités, changements de classe, métriques."""
+    p0 = model.predict_proba(X)[:, 1]
+    p1 = model.predict_proba(X_perturbed)[:, 1]
+    c0 = (p0 >= threshold).astype(int)
+    c1 = (p1 >= threshold).astype(int)
+    m0 = evaluate_model(y, c0, p0)
+    m1 = evaluate_model(y, c1, p1)
+    delta = np.abs(p1 - p0)
+    return {
+        "mean_abs_proba_change": float(delta.mean()),
+        "p99_abs_proba_change": float(np.quantile(delta, 0.99)),
+        "class_changes": int((c0 != c1).sum()),
+        "class_changes_frauds": int(((c0 != c1) & (np.asarray(y) == 1)).sum()),
+        "recall_before": m0["recall"],
+        "recall_after": m1["recall"],
+        "precision_before": m0["precision"],
+        "precision_after": m1["precision"],
+        "fpr_before": m0["fpr"],
+        "fpr_after": m1["fpr"],
+        "n_invalid": n_invalid,
+    }

@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-8.4.2, pluggy-1.7.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /content/AI-TestGuard
+configfile: pyproject.toml
+plugins: cov-7.1.0, hypothesis-6.170.15, langsmith-0.14.17, typeguard-4.6.0, anyio-4.16.0, platformdirs-4.14.3
+collecting ... collected 17 items
+
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[valeur manquante-<lambda>-manquantes] PASSED [  5%]
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[plusieurs variables manquantes-<lambda>-manquantes] PASSED [ 11%]
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[valeur infinie-<lambda>-infinies] PASSED [ 17%]
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[valeur non num\xe9rique-<lambda>-non num\xe9riques] PASSED [ 23%]
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[sch\xe9ma invalide : colonne absente-<lambda>-manquantes] PASSED [ 29%]
+tests/test_robustness.py::test_t15_invalid_inputs_are_rejected[sch\xe9ma invalide : colonne inconnue-<lambda>-inconnues] PASSED [ 35%]
+tests/test_robustness.py::test_t15_extreme_amount_is_processed_with_alert[10] PASSED [ 41%]
+tests/test_robustness.py::test_t15_extreme_amount_is_processed_with_alert[1000] PASSED [ 47%]
+tests/test_robustness.py::test_t15_extreme_amount_is_processed_with_alert[1000000] PASSED [ 52%]
+tests/test_robustness.py::test_t15_distribution_shift_triggers_drift_alert PASSED [ 58%]
+tests/test_robustness.py::test_t15_in_distribution_data_raises_no_drift_alert PASSED [ 64%]
+tests/test_robustness.py::test_t15_small_perturbation_has_limited_effect PASSED [ 70%]
+tests/test_robustness.py::test_t15_sensitivity_grows_with_amplitude PASSED [ 76%]
+tests/test_robustness.py::test_t15_amount_perturbation_counts_invalid_cases PASSED [ 82%]
+tests/test_robustness.py::test_perturbation_does_not_modify_input PASSED [ 88%]
+tests/test_robustness.py::test_unknown_perturbation_is_rejected PASSED   [ 94%]
+tests/test_robustness.py::test_t04_property_any_valid_transaction_gets_valid_probability PASSED [100%]
+
+============================== 17 passed in 2.31s ==============================

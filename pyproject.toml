@@ -13,6 +13,8 @@ markers = [
 [tool.ruff]
 line-length = 120
 target-version = "py313"
+# les notebooks d'analyse (cellules Colab, commandes shell) ne sont pas soumis au linter
+extend-exclude = ["notebooks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B"]

@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-8.4.2, pluggy-1.7.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /content/AI-TestGuard
+configfile: pyproject.toml
+plugins: cov-7.1.0, hypothesis-6.170.15, langsmith-0.14.17, typeguard-4.6.0, anyio-4.16.0, platformdirs-4.14.3
+collecting ... collected 16 items
+
+tests/test_integration.py::test_pipeline_runs_end_to_end PASSED          [  6%]
+tests/test_integration.py::test_t03_no_non_finite_values_after_preprocessing PASSED [ 12%]
+tests/test_integration.py::test_dimensions_are_consistent PASSED         [ 18%]
+tests/test_integration.py::test_t10_scaler_fitted_on_training_data_only PASSED [ 25%]
+tests/test_integration.py::test_t10_no_shared_transactions_between_train_and_test PASSED [ 31%]
+tests/test_integration.py::test_t10_duplicates_cannot_leak PASSED        [ 37%]
+tests/test_integration.py::test_t11_stratification_preserved PASSED      [ 43%]
+tests/test_integration.py::test_t05_t12_threshold_comes_from_validation_only PASSED [ 50%]
+tests/test_integration.py::test_t14_reloaded_pipeline_gives_identical_predictions PASSED [ 56%]
+tests/test_integration.py::test_t14_saved_metadata_is_complete PASSED    [ 62%]
+tests/test_integration.py::test_load_model_missing_file PASSED           [ 68%]
+tests/test_integration.py::test_load_model_corrupted_file PASSED         [ 75%]
+tests/test_integration.py::test_load_model_invalid_content PASSED        [ 81%]
+tests/test_integration.py::test_load_model_wrong_schema PASSED           [ 87%]
+tests/test_integration.py::test_save_model_rejects_invalid_threshold PASSED [ 93%]
+tests/test_integration.py::test_pipeline_rejects_invalid_input_file PASSED [100%]
+
+============================== 16 passed in 1.72s ==============================

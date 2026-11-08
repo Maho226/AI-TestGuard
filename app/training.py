@@ -100,3 +100,44 @@ def load_model(path) -> dict:
     if list(bundle["features"]) != FEATURES:
         raise ValueError("Le modèle a été entraîné avec un schéma de variables différent")
     return bundle
+
+
+def run_training_pipeline(data_path, model_path, model_name: str = "logistic_regression", seed: int = SEED) -> dict:
+    """Scénario complet : chargement, contrôle, séparation, réglage et seuil sur la validation,
+    sauvegarde, rechargement, prédiction sur le test et rapport de métriques."""
+    from app.evaluation import choose_threshold, evaluate_model
+    from app.prediction import predict_fraud
+    from app.preprocessing import load_data, preprocess_data, remove_duplicates, split_data
+
+    raw = load_data(data_path)
+    data, n_duplicates = remove_duplicates(raw)
+    X, y = preprocess_data(data)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, seed=seed)
+
+    pipeline, params, _ = tune_on_validation(X_train, y_train, X_val, y_val, model_name, seed=seed)
+    proba_val = pipeline.predict_proba(X_val[FEATURES])[:, 1]
+    threshold = choose_threshold(y_val, proba_val)
+
+    save_model(pipeline, model_path, threshold, {"model": model_name, "params": params, "seed": seed})
+    bundle = load_model(model_path)
+    y_pred, proba_test = predict_fraud(bundle["pipeline"], X_test, threshold=bundle["threshold"])
+
+    return {
+        "n_raw": len(raw),
+        "n_duplicates": n_duplicates,
+        "params": params,
+        "threshold": threshold,
+        "validation": evaluate_model(y_val, (proba_val >= threshold).astype(int), proba_val),
+        "test": evaluate_model(y_test, y_pred, proba_test),
+        "pipeline": pipeline,
+        "bundle": bundle,
+        "splits": {
+            "X_train": X_train,
+            "X_val": X_val,
+            "X_test": X_test,
+            "y_train": y_train,
+            "y_val": y_val,
+            "y_test": y_test,
+        },
+        "proba_test": proba_test,
+    }
