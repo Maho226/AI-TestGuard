@@ -40,7 +40,7 @@ MODEL_VERSIONS = {
         "grid": [{"C": c, "class_weight": {0: 1, 1: w}} for c in (0.1, 1.0) for w in (1, 10, 50)],
     },
 }
-CURRENT_VERSION = "v1"
+CURRENT_VERSION = "v2"
 
 
 def log_amount(X: pd.DataFrame) -> pd.DataFrame:
