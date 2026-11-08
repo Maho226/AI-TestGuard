@@ -69,6 +69,10 @@ métadonnées   schéma
 
 **Versions.** v1 : régression logistique, `class_weight="balanced"`, C ∈ {0,01 ; 0,1 ; 1} (retenu C = 0,01). v2 : ajout de `log(1 + Amount)` et pondération des fraudes w ∈ {1, 10, 50}, C ∈ {0,1 ; 1} (retenu C = 1, w = 10). Un arbre de décision a été comparé et écarté (précision 0,13 sur le test).
 
+**Vérification sur le jeu complet.** 1 081 doublons supprimés, taux de fraude identique dans les trois jeux (0,167 %), aucune transaction commune entre entraînement et test.
+
+![Séparation des données : doublons, stratification, absence de transaction commune](images/separation_donnees.png)
+
 ## 4. Tests unitaires et d'intégration
 
 | Fichier | Tests | Contenu |
@@ -110,11 +114,15 @@ Les tests utilisent des données synthétiques ou l'échantillon versionné : il
 
 ![Courbes ROC et précision-rappel](../reports/figures/courbes_roc_pr.png)
 
-**Analyse des erreurs (v1).** Les fraudes manquées se répartissent en deux groupes : une dizaine avec une probabilité inférieure à 0,3, que le modèle linéaire confond avec des transactions normales, et une dizaine juste sous le seuil (entre 0,95 et 0,999997). Les vrais et faux positifs sont tous concentrés à une probabilité de 1,0 : le modèle ne peut pas les classer entre eux, ce qui a révélé la saturation des probabilités (anomalie A1).
+**Analyse des erreurs (v1).** Les 26 fraudes manquées sont surtout des **petits montants** (médiane 2,99, contre 33,59 pour les fraudes détectées) ; leurs probabilités vont de 0,005 à presque 1 : une partie est confondue avec des transactions normales, une autre tombe juste sous le seuil. Les 9 fausses alertes portent sur des montants plus élevés (médiane 89,99) et, comme les fraudes détectées, ont toutes une probabilité de 1,0 : le modèle ne peut pas les départager, ce qui a révélé la saturation des probabilités (anomalie A1).
+
+![Évaluation de v1 sur le test : intervalles de confiance, critères, décision et profil des erreurs](images/evaluation_v1_erreurs.png)
 
 ![Distribution des erreurs](../reports/figures/distribution_erreurs.png)
 
 **Écart validation / test.** Rappel v1 : 0,809 en validation → 0,726 en test ; v2 : 0,819 → 0,747. La marge de 0,05 prévue pour le seuil est **insuffisante** (anomalie A2).
+
+![Évaluation de v2 sur le test : décision « rejeté » et avertissement sur la réutilisation du jeu de test](images/evaluation_v2_test.png)
 
 ## 6. Tests de robustesse
 
@@ -127,6 +135,8 @@ Perturbations appliquées au jeu de validation, en conservant les labels. Bruit 
 | Amount × 3 (inflation) | **104** | précision 0,884 → **0,400**, FPR × 11 | 2 | précision 0,811 → 0,804 |
 | V14 + 1 écart-type | 4 | rappel 0,809 → 0,766 | 7 | rappel 0,819 → 0,755 |
 
+![Comparaison de la robustesse de v1 et v2](images/robustesse_v1_v2.png)
+
 **Entrées invalides et extrêmes** (`reports/robustesse_scenarios.csv`) : valeur manquante, infinie, non numérique, montant négatif, colonne manquante ou inconnue → **toutes rejetées** avec un message explicite ; montants 10× et 1 000× le maximum d'entraînement → traités, probabilités valides, **alerte** `montant_eleve`.
 
 **Conclusion.** v1 était fortement sensible à l'échelle des montants (A3) ; v2 corrige ce défaut. Les deux versions restent sensibles à un décalage de V14, la variable la plus discriminante : c'est attendu, mais ce décalage reste **dans la plage** des valeurs d'entraînement et n'était pas détecté (A4, corrigé par la surveillance PSI, § 9). On mesure une sensibilité, on n'affirme pas une invariance.
@@ -135,12 +145,16 @@ Perturbations appliquées au jeu de validation, en conservant les labels. Bruit 
 
 La référence v1 est figée dans `reports/baseline_v1.json` (code, paramètres, environnement, empreinte SHA-256 du jeu, seuil, métriques de validation) et **n'est jamais recalculée automatiquement**. v2 est comparée sur le **même jeu de validation**.
 
+![Référence v1 figée et candidate v2 sur la validation (probabilités saturées : 23 contre 0)](images/reference_v1_candidate_v2.png)
+
 | Métrique (validation) | v1 (référence) | v2 | Écart | Tolérance | Régression |
 |---|---|---|---|---|---|
 | PR-AUC | 0,790 | 0,803 | + 0,013 | 0,02 | non |
 | Rappel | 0,809 | 0,819 | + 0,011 | 0,03 | non |
 | Précision | 0,884 | 0,811 | **− 0,073** | 0,05 | **oui** |
 | FPR | 0,018 % | 0,032 % | + 0,014 pt | 0,05 pt | non |
+
+![Comparaison à la référence et décision de non-régression](images/non_regression_decision.png)
 
 **Décision : « à investiguer »** (écart de précision supérieur à la tolérance mais inférieur au double). Investigation : la baisse de précision correspond à 8 fausses alertes supplémentaires sur 56 651 transactions, en échange de la suppression de la saturation des probabilités (23 probabilités à exactement 1,0 en v1, 0 en v2, anomalie A1) et de la sensibilité au montant (A3). v2 a été **acceptée comme base technique** et fusionnée par la Pull Request #2.
 
@@ -159,6 +173,8 @@ Protocole : `time.perf_counter`, 50 appels d'échauffement, 1 000 prédictions i
 | Taille du modèle | 0,004 Mo | ≤ 10 Mo | Oui |
 | Pic mémoire, lot de 10 000 | 12,1 Mo | ≤ 200 Mo | Oui |
 
+![Vérification des critères de performance](images/performance_criteres.png)
+
 Le contrôle des entrées double la latence mais reste largement dans le critère. Une API ajouterait le traitement HTTP et la sérialisation JSON, non mesurés. Les mesures sur Colab (machine partagée) sont variables : ce sont des ordres de grandeur.
 
 **Sécurité opérationnelle.** Aucun secret dans les fichiers suivis par Git (test automatisé, jeton GitHub stocké dans les secrets Colab) ; fichiers reçus limités à `.csv` et 500 Mo ; colonnes inconnues rejetées ; journaux limités à des comptages, sans valeur de transaction ; modèle accompagné de son empreinte SHA-256, vérifiée au chargement (joblib/pickle peut exécuter du code : seuls des fichiers de confiance sont chargés).
@@ -176,6 +192,8 @@ Le contrôle des entrées double la latence mais reste largement dans le critèr
 | Amount × 3 | 0,417 (Amount) | 0,171 % | dérive importante Amount |
 | Panne : tout est signalé | 0,001 | 100 % | taux de signalement |
 
+![Alertes de surveillance simulées](images/surveillance_alertes.png)
+
 **Jour 1 / jour 2 (validation).** Le jour 2 présente une dérive réelle (PSI V1 = 1,60, V3 = 1,44) sans dégradation du rappel (0,789 → 0,865) : une dérive des données n'implique pas une dérive du concept. Avec des seuils non calibrés, l'alerte se déclencherait chaque jour (A5). Le rappel ne peut être suivi qu'une fois les labels connus.
 
 ## 10. Intégration continue
@@ -183,6 +201,10 @@ Le contrôle des entrées double la latence mais reste largement dans le critèr
 Workflow `.github/workflows/tests.yml` : job `qualite` (Ruff : règles et formatage), job `tests` (Pytest hors tests lents, couverture ≥ 80 %, rapports JUnit et couverture en artefacts), job `performance` (manuel ou hebdomadaire). La branche `main` est protégée : Pull Request et réussite des deux contrôles obligatoires.
 
 ![Exécution réussie du workflow](images/ci_execution_reussie.png)
+
+**Démonstration d'un échec.** Un défaut a été introduit volontairement sur une branche (contrôle des montants négatifs désactivé) : la CI l'a détecté et a bloqué la fusion ; la Pull Request #1 a été fermée sans fusion.
+
+![Introduction du défaut volontaire sur la branche demo/echec-volontaire](images/ci_defaut_volontaire.png)
 
 ![Échec volontaire détecté (Pull Request #1, non fusionnée)](images/ci_echec_volontaire.png)
 

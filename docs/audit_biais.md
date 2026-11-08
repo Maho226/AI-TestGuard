@@ -29,9 +29,10 @@ Il ne contient **aucune caractéristique des clients** (âge, sexe, lieu de rés
 | Segment | Observation | Portée |
 |---|---|---|
 | Jour 1 / jour 2 (validation) | Rappel 0,789 / 0,865 ; précision 0,882 / 0,727 ; FPR 0,021 % / 0,043 % | Stabilité temporelle, pas équité |
+| Montant (analyse des erreurs, Partie III) | Fraudes manquées surtout de petit montant (médiane 2,99 contre 33,59 pour les fraudes détectées) | Performance par segment, pas équité |
 | Montant (robustesse, Partie V) | v1 très sensible à l'échelle des montants, corrigé en v2 | Performance par segment, pas équité |
 
-Avec 37 à 57 fraudes par jour, ces écarts sont **statistiquement fragiles**.
+Avec 26 fraudes manquées et 37 à 57 fraudes par jour, ces écarts sont **statistiquement fragiles**.
 
 ## 5. Données complémentaires nécessaires
 
