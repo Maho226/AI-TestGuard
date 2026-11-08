@@ -1,0 +1,146 @@
+{
+  "selected_model": "logistic_regression",
+  "threshold": 0.9999968615534689,
+  "test_metrics": {
+    "logistic_regression": {
+      "tp": 69.0,
+      "tn": 56642.0,
+      "fp": 9.0,
+      "fn": 26.0,
+      "accuracy": 0.9993832164381631,
+      "precision": 0.8846153846153846,
+      "recall": 0.7263157894736842,
+      "f1": 0.7976878612716763,
+      "roc_auc": 0.9635626815710968,
+      "pr_auc": 0.6737090765548188,
+      "fpr": 0.00015886745158955713,
+      "fnr": 0.2736842105263158
+    },
+    "decision_tree": {
+      "tp": 75.0,
+      "tn": 56145.0,
+      "fp": 506.0,
+      "fn": 20.0,
+      "accuracy": 0.9907306241849646,
+      "precision": 0.12908777969018934,
+      "recall": 0.7894736842105263,
+      "f1": 0.22189349112426035,
+      "roc_auc": 0.893310100904058,
+      "pr_auc": 0.628219051434363,
+      "fpr": 0.008931881167146211,
+      "fnr": 0.21052631578947367
+    },
+    "référence naïve (toujours normale)": {
+      "tp": 0.0,
+      "tn": 56651.0,
+      "fp": 0.0,
+      "fn": 95.0,
+      "accuracy": 0.9983258731892997,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "pr_auc": 0.0016741268107003137,
+      "fpr": 0.0,
+      "fnr": 1.0
+    }
+  },
+  "confidence_intervals_95": {
+    "recall": [
+      0.6344020456333596,
+      0.8125306372549019
+    ],
+    "precision": [
+      0.8108108108108109,
+      0.9473855092276144
+    ],
+    "fpr": [
+      7.060523246605768e-05,
+      0.00026478422736532633
+    ]
+  },
+  "acceptance": {
+    "criteria": {
+      "recall": {
+        "value": 0.7263157894736842,
+        "criterion": ">= 0.75",
+        "passed": false
+      },
+      "precision": {
+        "value": 0.8846153846153846,
+        "criterion": ">= 0.3",
+        "passed": true
+      },
+      "fpr": {
+        "value": 0.00015886745158955713,
+        "criterion": "<= 0.001",
+        "passed": true
+      },
+      "pr_auc": {
+        "value": 0.6737090765548188,
+        "criterion": ">= 0.7",
+        "passed": false
+      },
+      "roc_auc": {
+        "value": 0.9635626815710968,
+        "criterion": ">= 0.95",
+        "passed": true
+      }
+    },
+    "decision": "rejeté"
+  },
+  "tuning": [
+    {
+      "modèle": "logistic_regression",
+      "paramètres": "{'C': 0.01}",
+      "PR-AUC validation": 0.7902
+    },
+    {
+      "modèle": "logistic_regression",
+      "paramètres": "{'C': 0.1}",
+      "PR-AUC validation": 0.7877
+    },
+    {
+      "modèle": "logistic_regression",
+      "paramètres": "{'C': 1.0}",
+      "PR-AUC validation": 0.7876
+    },
+    {
+      "modèle": "decision_tree",
+      "paramètres": "{'max_depth': 4, 'min_samples_leaf': 20}",
+      "PR-AUC validation": 0.0924
+    },
+    {
+      "modèle": "decision_tree",
+      "paramètres": "{'max_depth': 6, 'min_samples_leaf': 20}",
+      "PR-AUC validation": 0.4658
+    },
+    {
+      "modèle": "decision_tree",
+      "paramètres": "{'max_depth': 8, 'min_samples_leaf': 20}",
+      "PR-AUC validation": 0.695
+    }
+  ],
+  "selection": [
+    {
+      "modèle": "logistic_regression",
+      "paramètres": "{'C': 0.01}",
+      "seuil": "1.0",
+      "PR-AUC entraînement": "0.7257",
+      "PR-AUC validation": "0.7902",
+      "rappel val.": "0.8085",
+      "précision val.": "0.8837",
+      "FPR val. %": "0.0177"
+    },
+    {
+      "modèle": "decision_tree",
+      "paramètres": "{'max_depth': 8, 'min_samples_leaf': 20}",
+      "seuil": "0.9485",
+      "PR-AUC entraînement": "0.7588",
+      "PR-AUC validation": "0.695",
+      "rappel val.": "0.8404",
+      "précision val.": "0.1411",
+      "FPR val. %": "0.8491"
+    }
+  ]
+}
