@@ -1,0 +1,77 @@
+name: Tests AI-TestGuard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:        # lancement manuel (tests coûteux compris)
+  schedule:
+    - cron: "17 3 * * 1"    # chaque lundi à 03:17 UTC : tests de performance
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualite:
+    name: Qualité du code (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install ruff==0.17.4
+      - name: Règles de style et d'erreurs
+        run: ruff check --output-format=github .
+      - name: Formatage
+        run: ruff format --check .
+
+  tests:
+    name: Tests unitaires, intégration, robustesse, non-régression, sécurité
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Installation des dépendances (versions figées)
+        run: pip install -r requirements.txt
+      - name: Pytest avec couverture (tests rapides)
+        run: >
+          python -m pytest -m "not slow"
+          --cov=app --cov-report=term-missing --cov-report=xml:reports/coverage.xml
+          --cov-fail-under=80
+          --junitxml=reports/junit.xml
+      - name: Résumé de couverture
+        if: always()
+        run: |
+          echo "## Couverture du code (app/)" >> "$GITHUB_STEP_SUMMARY"
+          python -m coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Conservation des rapports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: rapports-tests
+          path: |
+            reports/junit.xml
+            reports/coverage.xml
+
+  performance:
+    name: Tests de performance (manuels ou planifiés)
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -m slow -v

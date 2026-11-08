@@ -12,6 +12,9 @@ import pytest
 from app.prediction import measure_performance
 from app.training import run_training_pipeline
 
+# tests coûteux : exclus des Pull Requests, lancés manuellement ou chaque semaine (workflow)
+pytestmark = pytest.mark.slow
+
 SAMPLE = Path(__file__).resolve().parents[1] / "data" / "sample" / "creditcard_sample.csv"
 
 P95_SINGLE_MS = 50.0
