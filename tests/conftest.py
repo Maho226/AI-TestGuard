@@ -1,0 +1,28 @@
+"""Données de test synthétiques respectant le contrat (indépendantes du dataset Kaggle)."""
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from app.preprocessing import FEATURES, TARGET
+
+
+def make_transactions(n: int = 400, fraud_rate: float = 0.1, seed: int = 0) -> pd.DataFrame:
+    rng = np.random.default_rng(seed)
+    data = {"Time": np.sort(rng.uniform(0, 172_800, n))}
+    for i in range(1, 29):
+        data[f"V{i}"] = rng.normal(0, 1, n)
+    data["Amount"] = rng.exponential(80, n).round(2)
+    y = np.zeros(n, dtype=int)
+    y[: max(2, int(n * fraud_rate))] = 1
+    rng.shuffle(y)
+    # signal artificiel : les fraudes sont décalées sur quelques composantes
+    for col in ("V4", "V11", "V14"):
+        data[col] = data[col] + np.where(y == 1, 3.0 if col != "V14" else -3.0, 0.0)
+    data[TARGET] = y
+    return pd.DataFrame(data)[FEATURES + [TARGET]]
+
+
+@pytest.fixture
+def valid_df() -> pd.DataFrame:
+    return make_transactions()

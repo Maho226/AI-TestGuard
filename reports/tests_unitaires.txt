@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-8.4.2, pluggy-1.7.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /content/AI-TestGuard
+configfile: pyproject.toml
+plugins: hypothesis-6.170.15, cov-7.1.0, langsmith-0.14.17, typeguard-4.6.0, anyio-4.16.0, platformdirs-4.14.3
+collecting ... collected 36 items
+
+tests/test_preprocessing.py::test_t01_valid_data_is_accepted PASSED      [  2%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[Time] PASSED [  5%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[V1] PASSED [  8%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[V14] PASSED [ 11%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[V28] PASSED [ 13%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[Amount] PASSED [ 16%]
+tests/test_preprocessing.py::test_t01_missing_column_is_rejected[Class] PASSED [ 19%]
+tests/test_preprocessing.py::test_t01_target_not_required_for_prediction PASSED [ 22%]
+tests/test_preprocessing.py::test_t09_duplicated_column_is_rejected PASSED [ 25%]
+tests/test_preprocessing.py::test_t09_unknown_column_is_rejected PASSED  [ 27%]
+tests/test_preprocessing.py::test_t02_non_numeric_column_is_rejected PASSED [ 30%]
+tests/test_preprocessing.py::test_t02_boolean_column_is_rejected PASSED  [ 33%]
+tests/test_preprocessing.py::test_t09_empty_dataframe_is_rejected PASSED [ 36%]
+tests/test_preprocessing.py::test_t09_non_dataframe_is_rejected PASSED   [ 38%]
+tests/test_preprocessing.py::test_t09_missing_values_are_rejected[Time] PASSED [ 41%]
+tests/test_preprocessing.py::test_t09_missing_values_are_rejected[V7] PASSED [ 44%]
+tests/test_preprocessing.py::test_t09_missing_values_are_rejected[Amount] PASSED [ 47%]
+tests/test_preprocessing.py::test_t09_infinite_values_are_rejected[inf] PASSED [ 50%]
+tests/test_preprocessing.py::test_t09_infinite_values_are_rejected[-inf] PASSED [ 52%]
+tests/test_preprocessing.py::test_t09_negative_amount_is_rejected PASSED [ 55%]
+tests/test_preprocessing.py::test_t09_zero_amount_is_accepted PASSED     [ 58%]
+tests/test_preprocessing.py::test_t08_invalid_target_is_rejected[2] PASSED [ 61%]
+tests/test_preprocessing.py::test_t08_invalid_target_is_rejected[-1] PASSED [ 63%]
+tests/test_preprocessing.py::test_t08_invalid_target_is_rejected[0.5] PASSED [ 66%]
+tests/test_preprocessing.py::test_t03_preprocess_output_contract PASSED  [ 69%]
+tests/test_preprocessing.py::test_t03_column_order_is_normalized PASSED  [ 72%]
+tests/test_preprocessing.py::test_t03_single_observation_is_processed PASSED [ 75%]
+tests/test_preprocessing.py::test_t03_input_is_not_modified PASSED       [ 77%]
+tests/test_preprocessing.py::test_t03_property_finite_inputs_give_finite_outputs PASSED [ 80%]
+tests/test_preprocessing.py::test_remove_duplicates_counts_removed_rows PASSED [ 83%]
+tests/test_preprocessing.py::test_t11_split_sizes_stratification_and_disjointness PASSED [ 86%]
+tests/test_preprocessing.py::test_t11_split_is_reproducible PASSED       [ 88%]
+tests/test_preprocessing.py::test_load_data_missing_file_is_explicit PASSED [ 91%]
+tests/test_preprocessing.py::test_load_data_empty_file_is_rejected PASSED [ 94%]
+tests/test_preprocessing.py::test_t01_versioned_sample_respects_contract PASSED [ 97%]
+tests/test_preprocessing.py::test_standard_scaler PASSED                 [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.18-final-0 _______________
+
+Name                   Stmts   Miss  Cover   Missing
+----------------------------------------------------
+app/__init__.py            0      0   100%
+app/preprocessing.py      64      0   100%
+----------------------------------------------------
+TOTAL                     64      0   100%
+============================== 36 passed in 3.10s ==============================
