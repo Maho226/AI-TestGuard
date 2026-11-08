@@ -1,0 +1,43 @@
+{
+  "version": "v1",
+  "created_at": "2026-11-08T11:09:09+00:00",
+  "code_version": "3471401bd8aa82df5a02c4c88752d0225743299e",
+  "model": "logistic_regression",
+  "params": {
+    "C": 0.01
+  },
+  "log_amount": false,
+  "seed": 42,
+  "environment": {
+    "python": "3.13.18",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "joblib": "1.6.0"
+  },
+  "dataset": {
+    "file": "creditcard.csv",
+    "sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+    "rows": 284807,
+    "duplicates_removed": 1081,
+    "fraud_rate": 0.001667101358352777,
+    "validation_rows": 56745,
+    "validation_frauds": 94
+  },
+  "threshold": 0.9999968615534689,
+  "validation_metrics": {
+    "tp": 76,
+    "tn": 56641,
+    "fp": 10,
+    "fn": 18,
+    "accuracy": 0.9995065644550181,
+    "precision": 0.8837209302325582,
+    "recall": 0.8085106382978723,
+    "f1": 0.8444444444444444,
+    "roc_auc": 0.9793282648481915,
+    "pr_auc": 0.7902063826008877,
+    "fpr": 0.00017651939065506346,
+    "fnr": 0.19148936170212766
+  },
+  "saturated_probabilities": 23
+}

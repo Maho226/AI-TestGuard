@@ -1,0 +1,148 @@
+{
+  "comparison_validation": {
+    "metrics": {
+      "pr_auc": {
+        "reference": 0.7902063826008877,
+        "nouvelle": 0.803121054223106,
+        "ecart": 0.012914671622218266,
+        "tolerance": 0.02,
+        "regression": false
+      },
+      "recall": {
+        "reference": 0.8085106382978723,
+        "nouvelle": 0.8191489361702128,
+        "ecart": 0.010638297872340496,
+        "tolerance": 0.03,
+        "regression": false
+      },
+      "precision": {
+        "reference": 0.8837209302325582,
+        "nouvelle": 0.8105263157894737,
+        "ecart": -0.0731946144430845,
+        "tolerance": 0.05,
+        "regression": true
+      },
+      "fpr": {
+        "reference": 0.00017651939065506346,
+        "nouvelle": 0.00031773490317911425,
+        "ecart": 0.0001412155125240508,
+        "tolerance": 0.0005,
+        "regression": false
+      }
+    },
+    "decision": "investiguer"
+  },
+  "robustness": [
+    {
+      "version": "v1",
+      "scénario": "Amount × 3",
+      "changements de classe": 104,
+      "rappel": "0.809 → 0.809",
+      "précision": "0.884 → 0.400",
+      "FPR %": "0.018 → 0.201"
+    },
+    {
+      "version": "v1",
+      "scénario": "V14 + 1 écart-type",
+      "changements de classe": 4,
+      "rappel": "0.809 → 0.766",
+      "précision": "0.884 → 0.878",
+      "FPR %": "0.018 → 0.018"
+    },
+    {
+      "version": "v1",
+      "scénario": "Bruit V1–V28 10 %",
+      "changements de classe": 0,
+      "rappel": "0.809 → 0.809",
+      "précision": "0.884 → 0.884",
+      "FPR %": "0.018 → 0.018"
+    },
+    {
+      "version": "v2",
+      "scénario": "Amount × 3",
+      "changements de classe": 2,
+      "rappel": "0.819 → 0.830",
+      "précision": "0.811 → 0.804",
+      "FPR %": "0.032 → 0.034"
+    },
+    {
+      "version": "v2",
+      "scénario": "V14 + 1 écart-type",
+      "changements de classe": 7,
+      "rappel": "0.819 → 0.755",
+      "précision": "0.811 → 0.807",
+      "FPR %": "0.032 → 0.030"
+    },
+    {
+      "version": "v2",
+      "scénario": "Bruit V1–V28 10 %",
+      "changements de classe": 1,
+      "rappel": "0.819 → 0.819",
+      "précision": "0.811 → 0.802",
+      "FPR %": "0.032 → 0.034"
+    }
+  ],
+  "generalisation_pr_auc_v2": {
+    "entraînement": 0.7514649311843387,
+    "validation": 0.803121054223106,
+    "test": 0.7033127448166162
+  },
+  "test_v2": {
+    "tp": 71,
+    "tn": 56636,
+    "fp": 15,
+    "fn": 24,
+    "accuracy": 0.9993127268882388,
+    "precision": 0.8255813953488372,
+    "recall": 0.7473684210526316,
+    "f1": 0.7845303867403315,
+    "roc_auc": 0.9593760132445287,
+    "pr_auc": 0.7033127448166162,
+    "fpr": 0.0002647790859825952,
+    "fnr": 0.25263157894736843
+  },
+  "confidence_intervals_95_v2": {
+    "recall": [
+      0.6599948453608248,
+      0.8282828282828283
+    ],
+    "precision": [
+      0.7432265185978056,
+      0.896952890512854
+    ],
+    "fpr": [
+      0.0001412302834897284,
+      0.0004060456669740304
+    ]
+  },
+  "acceptance_v2": {
+    "criteria": {
+      "recall": {
+        "value": 0.7473684210526316,
+        "criterion": ">= 0.75",
+        "passed": false
+      },
+      "precision": {
+        "value": 0.8255813953488372,
+        "criterion": ">= 0.3",
+        "passed": true
+      },
+      "fpr": {
+        "value": 0.0002647790859825952,
+        "criterion": "<= 0.001",
+        "passed": true
+      },
+      "pr_auc": {
+        "value": 0.7033127448166162,
+        "criterion": ">= 0.7",
+        "passed": true
+      },
+      "roc_auc": {
+        "value": 0.9593760132445287,
+        "criterion": ">= 0.95",
+        "passed": true
+      }
+    },
+    "decision": "rejeté"
+  }
+}
