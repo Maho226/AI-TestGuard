@@ -1,0 +1,77 @@
+{
+  "latence_prediction_isolee_modele_seul": {
+    "moyenne_ms": 3.786876261999339,
+    "p50_ms": 3.330800000014733,
+    "p95_ms": 8.135544150033525,
+    "p99_ms": 13.153833519991156,
+    "max_ms": 21.508792000020094
+  },
+  "latence_prediction_isolee_avec_controle_entrees": {
+    "moyenne_ms": 7.464790688999472,
+    "p50_ms": 6.683927999972639,
+    "p95_ms": 16.06404990002374,
+    "p99_ms": 22.629415959993363,
+    "max_ms": 38.672595000036836
+  },
+  "debit_par_lot": {
+    "100": {
+      "duree_mediane_s": 0.008023318000027757,
+      "predictions_par_s": 12463.671513413035
+    },
+    "1000": {
+      "duree_mediane_s": 0.012672512999984065,
+      "predictions_par_s": 78910.94686596554
+    },
+    "10000": {
+      "duree_mediane_s": 0.01856576000000132,
+      "predictions_par_s": 538625.9436726151
+    }
+  },
+  "memoire_processus_mo": 439.9,
+  "memoire_pic_inference_lot_mo": 12.1,
+  "protocole": {
+    "repetitions_isolees": 1000,
+    "echauffement": 50,
+    "tailles_de_lot": [
+      100,
+      1000,
+      10000
+    ],
+    "repetitions_par_lot": 5,
+    "horloge": "time.perf_counter",
+    "materiel": {
+      "processeur": "x86_64",
+      "coeurs_logiques": 2,
+      "memoire_totale_go": 13.6,
+      "systeme": "Linux-6.6.159+-x86_64-with-glibc2.39",
+      "python": "3.13.18"
+    }
+  },
+  "taille_modele_mo": 0.003761,
+  "criteres": [
+    {
+      "mesure": "Latence P95 d'une prédiction isolée (avec contrôle)",
+      "valeur": "16.06404990002374",
+      "critère": "≤ 50 ms",
+      "respecté": "True"
+    },
+    {
+      "mesure": "Débit par lot de 1 000",
+      "valeur": "78910.94686596554",
+      "critère": "≥ 1 000 / s",
+      "respecté": "True"
+    },
+    {
+      "mesure": "Taille du modèle (Mo)",
+      "valeur": "0.003761",
+      "critère": "≤ 10 Mo",
+      "respecté": "True"
+    },
+    {
+      "mesure": "Pic mémoire à l'inférence, lot de 10 000 (Mo)",
+      "valeur": "12.1",
+      "critère": "≤ 200 Mo",
+      "respecté": "True"
+    }
+  ]
+}
