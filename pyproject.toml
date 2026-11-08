@@ -2,6 +2,10 @@
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-ra"
+filterwarnings = [
+    # avertissement interne scikit-learn 1.6 / SciPy récent, sans effet sur les résultats
+    "ignore:Unknown solver options:scipy.optimize.OptimizeWarning",
+]
 markers = [
     "slow: tests coûteux (entraînement complet, mesures de performance), exclus des Pull Requests",
 ]

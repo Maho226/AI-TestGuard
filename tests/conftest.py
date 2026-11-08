@@ -26,3 +26,25 @@ def make_transactions(n: int = 400, fraud_rate: float = 0.1, seed: int = 0) -> p
 @pytest.fixture
 def valid_df() -> pd.DataFrame:
     return make_transactions()
+
+
+@pytest.fixture(scope="session")
+def trained():
+    """Pipeline entraîné sur des données synthétiques, avec son seuil et sa référence."""
+    from app.prediction import training_reference
+    from app.preprocessing import preprocess_data, split_data
+    from app.training import train_model
+
+    X, y = preprocess_data(make_transactions(n=1200, fraud_rate=0.08, seed=1))
+    X_tr, X_va, X_te, y_tr, y_va, y_te = split_data(X, y)
+    model = train_model(X_tr, y_tr)
+    return {
+        "model": model,
+        "X_train": X_tr,
+        "X_val": X_va,
+        "X_test": X_te,
+        "y_train": y_tr,
+        "y_val": y_va,
+        "y_test": y_te,
+        "reference": training_reference(X_tr),
+    }
