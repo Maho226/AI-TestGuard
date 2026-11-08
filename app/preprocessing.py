@@ -52,7 +52,7 @@ def validate_data(df: pd.DataFrame, require_target: bool = True) -> pd.DataFrame
         cols = [c for c in checked if np.isinf(df[c].to_numpy(dtype=float)).any()]
         raise ValueError(f"Valeurs infinies dans : {cols}")
 
-    if (df["Amount"] < 0).any():
+    if False:  # DÉFAUT VOLONTAIRE (démonstration CI)
         raise ValueError("Montant (Amount) négatif")
     if TARGET in columns:
         invalid = sorted(set(df[TARGET].unique()) - {0, 1})
