@@ -2,7 +2,7 @@
 
 Qualification d'un modèle de détection de fraude bancaire : stratégie de test, tests automatisés, évaluation sur données déséquilibrées, robustesse, non-régression, performance, sécurité opérationnelle, intégration continue et surveillance.
 
-**Auteur :** Mohamed KABORE — **Module :** Test logiciel (ESMT) — **Enseignant :** M. Moustapha DER
+**Auteur :** Mohamed KABORE — **Module :** Test logiciel (ESMT) — **Enseignant :** Dr. Moustapha DER
 
 [![Tests AI-TestGuard](https://github.com/Maho226/AI-TestGuard/actions/workflows/tests.yml/badge.svg)](https://github.com/Maho226/AI-TestGuard/actions/workflows/tests.yml)
 
